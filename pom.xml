@@ -98,7 +98,7 @@
         <dependency>
             <groupId>com.github.coco33920</groupId>
             <artifactId>SQSApi</artifactId>
-            <version>f6f719656c</version>
+            <version>6ed41aaee2</version>
         </dependency>
         <dependency>
             <groupId>com.sandec.jpro</groupId>

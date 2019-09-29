@@ -13,11 +13,18 @@
 }
 
 .jfx-text-area {
-    -fx-text-inner-color: #5B1414;
+    -fx-text-inner-color: #AD722C;
+}
+
+.axis-label {
+    -fx-text-fill: #AD722C;
+}
+.chart-title {
+    -fx-text-fill: #AD722C;;
 }
 
 .jfx-text-field {
-    -fx-text-inner-color: #5B1414;
+    -fx-text-inner-color: #AD722C;
 }
 
 .hello-label {

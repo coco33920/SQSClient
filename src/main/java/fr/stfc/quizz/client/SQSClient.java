@@ -2,6 +2,7 @@ package fr.stfc.quizz.client;
 
 import com.jpro.webapi.JProApplication;
 import fr.colin.stfc.quizzapi.QuizzAPI;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -29,11 +30,15 @@ public class SQSClient extends JProApplication {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        primaryStage.setOnCloseRequest(event -> {
+            Platform.exit();
+        });
         primaryStage.setTitle("SQS Client");
         primaryStage.setScene(scene);
         primaryStage.setHeight(720);
         primaryStage.setWidth(1280);
         primaryStage.show();
+
     }
 
 }

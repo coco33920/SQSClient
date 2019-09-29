@@ -9,15 +9,19 @@ import fr.colin.stfc.quizzapi.objects.CompletedQuizz;
 import fr.colin.stfc.quizzapi.objects.Questions;
 import fr.colin.stfc.quizzapi.objects.Quizz;
 import fr.stfc.quizz.client.objects.QuestionS;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -136,7 +140,7 @@ public class SQSClientController {
         scrollPane.setPadding(new Insets(10));
         Background background = new Background(new BackgroundFill(Color.web("#143F48"), CornerRadii.EMPTY, Insets.EMPTY));
         scrollPane.setBackground(background);
-        scrollPane.setBorder(new Border(new BorderStroke(Color.web("#5B1414"), BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, new BorderWidths(2))));
+        scrollPane.setBorder(new Border(new BorderStroke(Color.web("#AD722C"), BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, new BorderWidths(2))));
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.setBackground(background);
@@ -146,14 +150,14 @@ public class SQSClientController {
         for (int i = 0; i < quizz.getQuizz().getQuestions().size(); i++) {
             VBox v = new VBox();
             v.setBackground(background);
-            v.setBorder(new Border(new BorderStroke(Color.web("#AD722C"), BorderStrokeStyle.DASHED, CornerRadii.EMPTY, new BorderWidths(2))));
+            v.setBorder(new Border(new BorderStroke(Color.web("#5B1414"), BorderStrokeStyle.DASHED, CornerRadii.EMPTY, new BorderWidths(2))));
             Label label = new Label("Question #" + i);
-            label.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #5B1414");
+            label.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
             Label gavedAnswer = new Label("Réponse donnée : " + quizz.getAnswers().get(i));
-            gavedAnswer.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #5B1414");
+            gavedAnswer.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
 
             Label answer = new Label("Réponse attendue : " + quizz.getQuizz().getQuestions().get(i).getAnswer());
-            answer.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #5B1414");
+            answer.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
             JFXCheckBox checkBox = new JFXCheckBox();
             checkBox.setText("Vrai/Faux ?");
             checkBox.setCheckedColor(Color.web("5B1414"));
@@ -190,8 +194,7 @@ public class SQSClientController {
             pane.setBottom(constructBottom());
             VBox vBoxs = new VBox();
             Label label = new Label("La correction est terminée !\nVous pouvez maintenant la recevoir par mail!");
-            label.setStyle("-fx-font-family: Trek; -fx-font-size: 20; -fx-text-fill: #5B1414");
-            label.setTextFill(Color.web("#5B1414"));
+            label.setStyle("-fx-font-family: Trek; -fx-font-size: 20; -fx-text-fill: #AD722C");
             label.setAlignment(Pos.CENTER);
             vBoxs.setPadding(new Insets(10));
             vBoxs.setSpacing(30);
@@ -239,7 +242,7 @@ public class SQSClientController {
         scrollPane.setPadding(new Insets(10));
         Background background = new Background(new BackgroundFill(Color.web("#143F48"), CornerRadii.EMPTY, Insets.EMPTY));
         scrollPane.setBackground(background);
-        scrollPane.setBorder(new Border(new BorderStroke(Color.web("#5B1414"), BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, new BorderWidths(2))));
+        scrollPane.setBorder(new Border(new BorderStroke(Color.web("#AD722C"), BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, new BorderWidths(2))));
         int i = 0;
         VBox vBoxs = new VBox();
         vBoxs.setAlignment(Pos.CENTER);
@@ -251,13 +254,13 @@ public class SQSClientController {
             i++;
             Label question = new Label("Question #" + i + " " + questions.getTitle());
             Label content = new Label(questions.getContent());
-            question.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #5B1414");
-            content.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #5B1414");
+            question.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
+            content.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
             JFXTextField answer = new JFXTextField("Répondre ici");
             textFields.add(answer);
             VBox questioni = new VBox();
             questioni.setBackground(background);
-            questioni.setBorder(new Border(new BorderStroke(Color.web("#AD722C"), BorderStrokeStyle.DASHED, CornerRadii.EMPTY, new BorderWidths(2))));
+            questioni.setBorder(new Border(new BorderStroke(Color.web("#5B1414"), BorderStrokeStyle.DASHED, CornerRadii.EMPTY, new BorderWidths(2))));
             questioni.setAlignment(Pos.CENTER);
             questioni.setSpacing(10);
             questioni.getChildren().addAll(question, content, answer);
@@ -283,7 +286,7 @@ public class SQSClientController {
             VBox vBox = new VBox();
             Label label = new Label("Le quizz est terminé !\nVous pouvez recevoir la version corrigée par mail ou donner la tablette à un opérateur pour qu'il vous le corrige !");
             label.setStyle("-fx-font-family: Trek; -fx-font-size: 20");
-            label.setTextFill(Color.web("#5B1414"));
+            label.setTextFill(Color.web("#AD722C"));
             label.setAlignment(Pos.CENTER);
             vBox.setPadding(new Insets(10));
             vBox.setSpacing(30);
@@ -360,7 +363,7 @@ public class SQSClientController {
         vBox.setPadding(new Insets(10));
         vBox.setSpacing(10);
         Label label = new Label("Mot de passe admin :");
-        label.setStyle("-fx-font-family: Trek; -fx-font-size: 15; -fx-text-fill: #5B1414");
+        label.setStyle("-fx-font-family: Trek; -fx-font-size: 15; -fx-text-fill: #AD722C");
         label.setWrapText(true);
         JFXPasswordField passwordField = new JFXPasswordField();
         JFXButton verf = new JFXButton("Valider");
@@ -397,7 +400,7 @@ public class SQSClientController {
         question.setSpacing(10);
 
         Label l = new Label("Catégorie :");
-        l.setStyle("-fx-font-family: Trek; -fx-font-size: 15; -fx-text-fill: #5B1414");
+        l.setStyle("-fx-font-family: Trek; -fx-font-size: 15; -fx-text-fill: #AD722C");
         JFXTextField ls = new JFXTextField("Nom");
         JFXButton valid = new JFXButton("Valider");
 
@@ -406,8 +409,8 @@ public class SQSClientController {
         Separator s = new Separator();
         s.setOrientation(Orientation.HORIZONTAL);
         Label labelS = new Label("Thème :");
-        labelS.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #5B1414");
-        labelQ.setStyle("-fx-font-family: Trek; -fx-font-size: 15; -fx-text-fill: #5B1414");
+        labelS.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
+        labelQ.setStyle("-fx-font-family: Trek; -fx-font-size: 15; -fx-text-fill: #AD722C");
 
         JFXComboBox<CategoriesLabel> categoryComboBox = new JFXComboBox<>();
         categories.forEach(category -> categoryComboBox.getItems().add(new CategoriesLabel(category)));
@@ -471,6 +474,7 @@ public class SQSClientController {
         JFXButton remove = new JFXButton("Supprimer des catégories");
         JFXButton removeS = new JFXButton("Supprimer des questions");
         JFXButton back = new JFXButton("Retour");
+        JFXButton chart = new JFXButton("Graphiques");
         VBox sideBar = new VBox();
         sideBar.setSpacing(10);
         sideBar.setPadding(new Insets(20));
@@ -498,7 +502,24 @@ public class SQSClientController {
             intializeQuestionDelete(token);
         });
 
-        sideBar.getChildren().addAll(button, removeS, remove, back);
+        chart.setOnMouseClicked(event -> {
+            Stage primaryStage = new Stage();
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/chart.fxml"));
+                Scene scene = new Scene(loader.load());
+                scene.getStylesheets().add("/css/main.css");
+                primaryStage.setScene(scene);
+                primaryStage.setResizable(false);
+                primaryStage.setWidth(1280);
+                primaryStage.setHeight(720);
+                primaryStage.setTitle("SQS Client - Graphiques");
+                primaryStage.show();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        });
+
+        sideBar.getChildren().addAll(button, removeS, remove, back, chart);
 
 
         pane.setRight(sideBar);
@@ -515,7 +536,7 @@ public class SQSClientController {
         HashMap<JFXCheckBox, String> checks = new HashMap<>();
 
         ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setBorder(new Border(new BorderStroke(Color.web("#5B1414"), BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, new BorderWidths(2))));
+        scrollPane.setBorder(new Border(new BorderStroke(Color.web("#AD722C"), BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, new BorderWidths(2))));
         scrollPane.setBackground(background);
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
@@ -534,12 +555,12 @@ public class SQSClientController {
             Label name = new Label(c.getName());
             Label uuid = new Label(c.getUuid());
             Label noq = new Label("Questions : " + questions.get(c.getUuid()).size());
-            name.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #5B1414");
-            uuid.setStyle("-fx-font-family: Trek; -fx-font-size: 7; -fx-text-fill: #5B1414");
-            noq.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #5B1414");
+            name.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
+            uuid.setStyle("-fx-font-family: Trek; -fx-font-size: 7; -fx-text-fill: #AD722C");
+            noq.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
             JFXCheckBox suppr = new JFXCheckBox("Supprimer");
-            suppr.setTextFill(Color.web("#5B1414"));
-            suppr.setCheckedColor(Color.web("#5B1414"));
+            suppr.setTextFill(Color.web("#AD722C"));
+            suppr.setCheckedColor(Color.web("#AD722C"));
             child.getChildren().addAll(name, uuid, noq, suppr);
             checks.put(suppr, c.getUuid());
             scrollPaneContent.getChildren().addAll(child);
@@ -654,7 +675,7 @@ public class SQSClientController {
             } else {
                 //COMPUTE AND CACHE
                 ScrollPane scrollPane = new ScrollPane();
-                scrollPane.setBorder(new Border(new BorderStroke(Color.web("#5B1414"), BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, new BorderWidths(2))));
+                scrollPane.setBorder(new Border(new BorderStroke(Color.web("#AD722C"), BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, new BorderWidths(2))));
                 scrollPane.setBackground(background);
                 scrollPane.setFitToWidth(true);
                 scrollPane.setFitToHeight(true);
@@ -677,13 +698,13 @@ public class SQSClientController {
                     Label q2 = new Label("UUID " + qs.getUuid());
                     Label q3 = new Label(qs.getContent());
 
-                    q1.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #5B1414");
-                    q2.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #5B1414");
-                    q3.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #5B1414");
+                    q1.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
+                    q2.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
+                    q3.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
 
                     JFXCheckBox suppr = new JFXCheckBox("Supprimer");
-                    suppr.setTextFill(Color.web("#5B1414"));
-                    suppr.setCheckedColor(Color.web("#5B1414"));
+                    suppr.setTextFill(Color.web("#AD722C"));
+                    suppr.setCheckedColor(Color.web("#AD722C"));
 
                     child.getChildren().addAll(q1, q2, q3, suppr);
                     checkBoxs.put(suppr, qs.getUuid());
@@ -750,7 +771,7 @@ public class SQSClientController {
         if (adminQuestionCache == null) {
 
             ScrollPane scrollPane = new ScrollPane();
-            scrollPane.setBorder(new Border(new BorderStroke(Color.web("#5B1414"), BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, new BorderWidths(2))));
+            scrollPane.setBorder(new Border(new BorderStroke(Color.web("#AD722C"), BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, new BorderWidths(2))));
             scrollPane.setBackground(background);
             scrollPane.setFitToWidth(true);
             scrollPane.setFitToHeight(true);
@@ -767,7 +788,7 @@ public class SQSClientController {
                 child.setPadding(new Insets(10));
                 child.setSpacing(10);
                 Label sdf = new Label("Question " + i);
-                sdf.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #5B1414");
+                sdf.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
                 JFXTextField title = new JFXTextField("Titre");
                 JFXTextArea content = new JFXTextArea("Question");
                 JFXTextArea answer = new JFXTextArea("Réponse");
