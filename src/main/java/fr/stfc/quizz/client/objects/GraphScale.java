@@ -7,10 +7,10 @@ import java.util.function.Function;
 public enum GraphScale {
 
 
-    HOUR("Heure", 24, new SimpleDateFormat("dd/MM/yyyy 00:00:00"), 24 * 3600 * 1000, 3600 * 1000),
-    DAY("Jour", 7, new SimpleDateFormat("dd/MM/yyyy 00:00:00"), 24 * 3600 * 1000 * 7, 3600 * 1000 * 24),
-    MONTH("Mois", 12, new SimpleDateFormat("dd/MM/yyyy 00:00:00"), 24 * 3600 * 1000L * 28, 3600 * 1000 * 24),
-    YEAR("An", 10, new SimpleDateFormat("dd/MM/yyyy 00:00:00"), 24 * 3600 * 1000 * 7, 3600 * 1000 * 24);
+    HOUR("Heure", 1, new SimpleDateFormat("dd/MM/yyyy 00:00:00"), 24 * 3600 * 1000, 3600 * 1000),
+    DAY("Jour", 1, new SimpleDateFormat("dd/MM/yyyy 00:00:00"), 24 * 3600 * 1000 * 7, 3600 * 1000 * 24),
+    MONTH("Mois", 1, new SimpleDateFormat("01/MM/yyyy 00:00:00"), 24 * 3600 * 1000L * 28, 3600 * 1000 * 24),
+    YEAR("An", 1, new SimpleDateFormat("dd/MM/yyyy 00:00:00"), 24 * 3600 * 1000 * 365L, 3600 * 1000 * 24 * 5);
 
     private String label;
     private int number;
@@ -47,6 +47,10 @@ public enum GraphScale {
         h.put("Mois", months);
     }
 
+    public int getNumber() {
+        return number;
+    }
+
     private GraphScale(String label, int number, SimpleDateFormat format, long amplitude, long interval) {
         this.label = label;
         this.number = number;
@@ -67,7 +71,7 @@ public enum GraphScale {
         return format;
     }
 
-    public String constructLabel(int i) {
+    public String constructLabel(int i, long... dates) {
         if (this == HOUR) {
             int s = (i - 1);
             if (s == -1)
@@ -79,14 +83,20 @@ public enum GraphScale {
             return d.get(i);
         }
         if (this == MONTH) {
-            HashMap<Integer, String> ds = h.get("Mois");
-            return ds.get(i);
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM");
+            long actualDate = MONTH.interval * i;
+            long startDate = dates[0];
+            long totalDate = actualDate + startDate;
+            return format.format(totalDate);
+        }
+        if (this == YEAR) {
+            SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+            long actualDate = MONTH.interval * i * 5;
+            long startDate = dates[0];
+            long totalDate = actualDate + startDate;
+            return format.format(totalDate);
         }
         return "A";
-    }
-
-    public int getNumber() {
-        return number;
     }
 
     public String getLabel() {

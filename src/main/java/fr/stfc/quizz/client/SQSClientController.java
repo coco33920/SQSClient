@@ -213,6 +213,8 @@ public class SQSClientController {
                 String emails = mail.getText();
                 if (emails.isEmpty()) {
                     sendPopUp("Mail", "Mail", "Vous devez spécifier une adresse email valide", Alert.AlertType.INFORMATION);
+                    email.setDisable(false);
+                    valider.setDisable(false);
                     return;
                 }
                 api.sendCompletedQuizz(emails, quizz);
@@ -310,6 +312,8 @@ public class SQSClientController {
                 email.setDisable(true);
                 if (emails.isEmpty()) {
                     sendPopUp("Mail", "Mail", "Vous devez spécifier une adresse email valide", Alert.AlertType.INFORMATION);
+                    valider.setDisable(false);
+                    email.setDisable(false);
                     return;
                 }
                 api.sendCompletedQuizz(emails, completedQuizz);
@@ -514,7 +518,7 @@ public class SQSClientController {
                 primaryStage.setHeight(720);
                 primaryStage.setTitle("SQS Client - Graphiques");
                 primaryStage.show();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });

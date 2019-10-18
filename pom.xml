@@ -6,7 +6,7 @@
 
     <groupId>fr.stfc.quizz.client</groupId>
     <artifactId>SQSClient</artifactId>
-    <version>v1.1</version>
+    <version>v1.2</version>
 
 
     <properties>

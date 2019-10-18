@@ -1,36 +1,40 @@
 package fr.stfc.quizz.client;
 
-import com.jfoenix.controls.JFXButton;
 import fr.colin.stfc.quizzapi.QuizzAPI;
 import fr.colin.stfc.quizzapi.objects.Quizz;
 import fr.colin.stfc.quizzapi.objects.Scores;
 import fr.stfc.quizz.client.objects.GraphScale;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Cursor;
 import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import sun.nio.cs.HistoricallyNamedCharset;
 
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Random;
-import java.util.function.Function;
 
 public class GraphDataVisualizationController {
 
     @FXML
     private AnchorPane anchorPane;
+
+    public static void main(String... args) {
+        GraphScale m = GraphScale.MONTH;
+        try {
+            ArrayList<ArrayList<Quizz>> q = QuizzAPI.DEFAULT_INSTANCE.fetchQuizz(m.getFormat().format(new Date(System.currentTimeMillis() - m.getAmplitude())), m.getFormat().format(new Date(System.currentTimeMillis())), m.getInterval());
+            System.out.println(q.size());
+        } catch (NullPointerException exception) {
+            exception.printStackTrace();
+        }
+
+    }
 
     @FXML
     public void initialize() {
@@ -73,10 +77,6 @@ public class GraphDataVisualizationController {
         Button moiss = new Button("Mois");
         Button anss = new Button("An");
 
-        mois.setDisable(true);
-        moiss.setDisable(true);
-        ans.setDisable(true);
-        anss.setDisable(true);
 
         secondGraphButtons.getChildren().addAll(sL, heures, jours, moiss, anss);
 
@@ -97,6 +97,14 @@ public class GraphDataVisualizationController {
             firstGraph.getChildren().clear();
             firstGraph.getChildren().add(constructFirstGraph(GraphScale.DAY));
         });
+        mois.setOnMouseClicked(event -> {
+            firstGraph.getChildren().clear();
+            firstGraph.getChildren().add(constructFirstGraph(GraphScale.MONTH));
+        });
+        ans.setOnMouseClicked(event -> {
+            firstGraph.getChildren().clear();
+            firstGraph.getChildren().add(constructFirstGraph(GraphScale.YEAR));
+        });
 
 
         AnchorPane secondGraph = new AnchorPane();
@@ -114,6 +122,14 @@ public class GraphDataVisualizationController {
             secondGraph.getChildren().clear();
             secondGraph.getChildren().add(constructSecondGraph(GraphScale.DAY));
         });
+        moiss.setOnMouseClicked(event -> {
+            secondGraph.getChildren().clear();
+            secondGraph.getChildren().add(constructSecondGraph(GraphScale.MONTH));
+        });
+        anss.setOnMouseClicked(event -> {
+            secondGraph.getChildren().clear();
+            secondGraph.getChildren().add(constructSecondGraph(GraphScale.YEAR));
+        });
 
         anchorPane.getChildren().addAll(firstGraph, secondGraph);
     }
@@ -126,18 +142,22 @@ public class GraphDataVisualizationController {
         x.setAnimated(false);
         y.setAnimated(false);
 
+        String date1 = scale.getFormat().format(new Date(System.currentTimeMillis() - scale.getAmplitude()));
+        String date2 = scale.getFormat().format(new Date(System.currentTimeMillis()));
+
         final LineChart<String, Number> lineChart = new LineChart<>(x, y);
-        lineChart.setTitle("Nombre de quizzs créés, échelle : " + scale.getLabel());
+        lineChart.setTitle("Nombre de quizzs créés. Date : " + date1.substring(0, date1.length() - 8) + " - " + date2.substring(0, date2.length() - 8));
         lineChart.setAnimated(false);
         lineChart.setPrefSize(1059, 360);
         lineChart.setLegendVisible(false);
 
         XYChart.Series<String, Number> series = new XYChart.Series<>();
 
-        ArrayList<ArrayList<Quizz>> q = QuizzAPI.DEFAULT_INSTANCE.fetchQuizz(scale.getFormat().format(new Date(System.currentTimeMillis())), scale.getFormat().format(new Date(System.currentTimeMillis() + scale.getAmplitude())), scale.getInterval());
+        ArrayList<ArrayList<Quizz>> q = QuizzAPI.DEFAULT_INSTANCE.fetchQuizz(date1, date2, scale.getInterval());
         //TODO : Better X values
-        for (int i = 0; i < q.size(); i++) {
-            XYChart.Data<String, Number> data = new XYChart.Data<>(scale.constructLabel(i), q.get(i).size());
+        long sDate = scale.getFormat().parse(date1, new ParsePosition(0)).getTime();
+        for (int i = 0; i < q.size(); i+=scale.getNumber()) {
+            XYChart.Data<String, Number> data = new XYChart.Data<>(scale.constructLabel(i, sDate), q.get(i).size());
             series.getData().add(data);
         }
 
@@ -158,13 +178,18 @@ public class GraphDataVisualizationController {
         final CategoryAxis x = new CategoryAxis();
         final NumberAxis y = new NumberAxis();
         x.setTickLabelRotation(90);
+        String date1 = scale.getFormat().format(new Date(System.currentTimeMillis() - scale.getAmplitude()));
+        String date2 = scale.getFormat().format(new Date(System.currentTimeMillis()));
         x.setLabel(scale.getLabel());
         y.setLabel("Meilleur Score");
         x.setAnimated(false);
         y.setAnimated(false);
 
+        long sDate = scale.getFormat().parse(date1, new ParsePosition(0)).getTime();
+
+
         final StackedBarChart<String, Number> barChart = new StackedBarChart<>(x, y);
-        barChart.setTitle("Meilleur Score, échelle : " + scale.getLabel());
+        barChart.setTitle("Meilleur score. Date : " + date1.substring(0, date1.length() - 8) + " - " + date2.substring(0, date2.length() - 8));
         barChart.setAnimated(false);
         barChart.setPrefSize(1059, 359);
         barChart.setLegendVisible(false);
@@ -173,7 +198,7 @@ public class GraphDataVisualizationController {
         XYChart.Series<String, Number> series1 = new XYChart.Series<>();
 
 
-        ArrayList<ArrayList<Scores>> scores = QuizzAPI.DEFAULT_INSTANCE.fetchQuizzData(scale.getFormat().format(new Date(System.currentTimeMillis())), scale.getFormat().format(new Date(System.currentTimeMillis() + scale.getAmplitude())), scale.getInterval());
+        ArrayList<ArrayList<Scores>> scores = QuizzAPI.DEFAULT_INSTANCE.fetchQuizzData(date1, date2, scale.getInterval());
 
 
         ArrayList<Scores[]> twoBest = new ArrayList<>();
@@ -186,14 +211,16 @@ public class GraphDataVisualizationController {
             s.sort((o1, o2) -> (int) (o2.getScore() - o1.getScore()));
             if (s.size() < 2)
                 twoBest.add(new Scores[]{s.get(0), new Scores("", 0d, 0L, "")});
-            else
+            else{
                 twoBest.add(new Scores[]{s.get(0), s.get(1)});
+            }
+
         }
         ArrayList<String> cats = new ArrayList<>();
         int s = 0;
-        while (s < scale.getNumber()) {
-            cats.add(scale.constructLabel(s));
-            s++;
+        while (s < scores.size()) {
+            cats.add(scale.constructLabel(s, sDate));
+            s+=scale.getNumber();
         }
         x.setCategories(FXCollections.<String>observableArrayList(cats));
 
@@ -230,5 +257,6 @@ public class GraphDataVisualizationController {
         return barChart;
 
     }
+
 
 }

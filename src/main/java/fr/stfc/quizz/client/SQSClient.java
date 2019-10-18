@@ -3,10 +3,23 @@ package fr.stfc.quizz.client;
 import com.jpro.webapi.JProApplication;
 import fr.colin.stfc.quizzapi.QuizzAPI;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Side;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
+import javafx.scene.control.Label;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
+
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.IOException;
 
 public class SQSClient extends JProApplication {
 
