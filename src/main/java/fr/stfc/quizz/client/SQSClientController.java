@@ -641,10 +641,90 @@ public class SQSClientController {
         pane.setRight(sideBar);
     }
 
+    public ScrollPane construct(Category c, String token){
+        Background background = new Background(new BackgroundFill(Color.web("#143F48"), CornerRadii.EMPTY, Insets.EMPTY));
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setBorder(new Border(new BorderStroke(Color.web("#AD722C"), BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, new BorderWidths(2))));
+        scrollPane.setBackground(background);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+        VBox scrollPaneContent = new VBox();
+        HashMap<JFXCheckBox, String> checkBoxs = new HashMap<>();
+        scrollPaneContent.setBackground(background);
+        scrollPaneContent.setPadding(new Insets(20));
+        scrollPaneContent.setSpacing(40);
+        ArrayList<Questions> s = SQSClientController.questions.get(c.getUuid());
+        int i = 0;
+        for (Questions qs : s) {
+            VBox child = new VBox();
+            child.setBackground(background);
+            child.setBorder(new Border(new BorderStroke(Color.web("#AD722C"), BorderStrokeStyle.DASHED, CornerRadii.EMPTY, new BorderWidths(2))));
+            child.setPadding(new Insets(10));
+            child.setSpacing(10);
+
+            Label q1 = new Label("Question " + i + " Titre " + qs.getTitle());
+            Label q2 = new Label("UUID " + qs.getUuid());
+            Label q3 = new Label(qs.getContent());
+
+            q1.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
+            q2.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
+            q3.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
+
+            JFXCheckBox suppr = new JFXCheckBox("Supprimer");
+            suppr.setTextFill(Color.web("#AD722C"));
+            suppr.setCheckedColor(Color.web("#AD722C"));
+
+            child.getChildren().addAll(q1, q2, q3, suppr);
+            checkBoxs.put(suppr, qs.getUuid());
+            scrollPaneContent.getChildren().add(child);
+        }
+        JFXCheckBox suppra = new JFXCheckBox("Supprimer tous");
+        suppra.setCheckedColor(Color.web("#AD722C"));
+        suppra.setTextFill(Color.web("#AD722C"));
+        suppra.setOnMouseClicked(event -> {
+            checkBoxs.keySet().forEach(JFXCheckBox::fire);
+        });
+        Button valider = new Button("Valider");
+
+        valider.setOnMouseClicked(event -> {
+            Optional<ButtonType> sd = sendPopUp("Categories", "Categories", "Les questions séléctionnées vont être supprimés, en êtes-vous sûr ?", Alert.AlertType.CONFIRMATION);
+
+            if (sd.isPresent() && sd.get().equals(ButtonType.CANCEL)) {
+                initializePostAdminLook(token);
+                return;
+            }
+            valider.setDisable(true);
+            suppra.setDisable(true);
+            checkBoxs.keySet().forEach(checkBox -> checkBox.setDisable(true));
+            ArrayList<String> toRemove = new ArrayList<>();
+            for (JFXCheckBox checkBox : checkBoxs.keySet()) {
+                if (checkBox.isSelected()) {
+                    toRemove.add(checkBoxs.get(checkBox));
+                    checkBox.fire();
+                }
+            }
+            String answesr = api.removeQuestionsBulk(toRemove, token);
+            if (answesr.contains("Success")) {
+                sendPopUp("Categorie", "Ajout", "Les questions ont été supprimés", Alert.AlertType.INFORMATION);
+            } else {
+                sendPopUp("Catégorie", "Ajout", "Erreur lors de l'ajout : " + answesr, Alert.AlertType.ERROR);
+            }
+            categories = new CopyOnWriteArrayList<>(api.getCategories());
+            questions = new ConcurrentHashMap<>(api.getQuestions());
+            removeQuestionCache.remove(c);
+            initializePostAdminLook(token);
+        });
+
+        scrollPaneContent.getChildren().addAll(suppra, valider);
+        scrollPane.setContent(scrollPaneContent);
+        removeQuestionCache.put(c, scrollPane);
+        return scrollPane;
+    }
+
     public void intializeQuestionDelete(String token) {
         pane.getChildren().clear();
         HBox top = constructTop();
-        Background background = new Background(new BackgroundFill(Color.web("#143F48"), CornerRadii.EMPTY, Insets.EMPTY));
+
         JFXComboBox<CategoriesLabel> categoryComboBox = new JFXComboBox<>();
         categories.forEach(category -> categoryComboBox.getItems().add(new CategoriesLabel(category)));
         categoryComboBox.setValue(categoryComboBox.getItems().get(0));
@@ -671,6 +751,7 @@ public class SQSClientController {
         button.setOnMouseClicked(event -> {
             initializePostAdminLook(token);
         });
+        pane.setCenter(construct(categoryComboBox.getItems().get(0).getCategory(), token));
         pane.setRight(sideBar);
         categoryComboBox.setValue(categoryComboBox.getItems().get(0));
         categoryComboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -678,84 +759,8 @@ public class SQSClientController {
                 pane.setCenter(removeQuestionCache.get(newValue.getCategory()));
             } else {
                 //COMPUTE AND CACHE
-                ScrollPane scrollPane = new ScrollPane();
-                scrollPane.setBorder(new Border(new BorderStroke(Color.web("#AD722C"), BorderStrokeStyle.DOTTED, CornerRadii.EMPTY, new BorderWidths(2))));
-                scrollPane.setBackground(background);
-                scrollPane.setFitToWidth(true);
-                scrollPane.setFitToHeight(true);
-                VBox scrollPaneContent = new VBox();
-                HashMap<JFXCheckBox, String> checkBoxs = new HashMap<>();
-                scrollPaneContent.setBackground(background);
-                scrollPaneContent.setPadding(new Insets(20));
-                scrollPaneContent.setSpacing(40);
-                Category c = newValue.getCategory();
-                ArrayList<Questions> s = SQSClientController.questions.get(c.getUuid());
-                int i = 0;
-                for (Questions qs : s) {
-                    VBox child = new VBox();
-                    child.setBackground(background);
-                    child.setBorder(new Border(new BorderStroke(Color.web("#AD722C"), BorderStrokeStyle.DASHED, CornerRadii.EMPTY, new BorderWidths(2))));
-                    child.setPadding(new Insets(10));
-                    child.setSpacing(10);
-
-                    Label q1 = new Label("Question " + i + " Titre " + qs.getTitle());
-                    Label q2 = new Label("UUID " + qs.getUuid());
-                    Label q3 = new Label(qs.getContent());
-
-                    q1.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
-                    q2.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
-                    q3.setStyle("-fx-font-family: Trek; -fx-font-size: 12; -fx-text-fill: #AD722C");
-
-                    JFXCheckBox suppr = new JFXCheckBox("Supprimer");
-                    suppr.setTextFill(Color.web("#AD722C"));
-                    suppr.setCheckedColor(Color.web("#AD722C"));
-
-                    child.getChildren().addAll(q1, q2, q3, suppr);
-                    checkBoxs.put(suppr, qs.getUuid());
-                    scrollPaneContent.getChildren().add(child);
-                }
-                JFXCheckBox suppra = new JFXCheckBox("Supprimer tous");
-                suppra.setCheckedColor(Color.web("#AD722C"));
-                suppra.setTextFill(Color.web("#AD722C"));
-                suppra.setOnMouseClicked(event -> {
-                    checkBoxs.keySet().forEach(JFXCheckBox::fire);
-                });
-                Button valider = new Button("Valider");
-
-                valider.setOnMouseClicked(event -> {
-                    Optional<ButtonType> sd = sendPopUp("Categories", "Categories", "Les questions séléctionnées vont être supprimés, en êtes-vous sûr ?", Alert.AlertType.CONFIRMATION);
-
-                    if (sd.isPresent() && sd.get().equals(ButtonType.CANCEL)) {
-                        initializePostAdminLook(token);
-                        return;
-                    }
-                    valider.setDisable(true);
-                    suppra.setDisable(true);
-                    checkBoxs.keySet().forEach(checkBox -> checkBox.setDisable(true));
-                    ArrayList<String> toRemove = new ArrayList<>();
-                    for (JFXCheckBox checkBox : checkBoxs.keySet()) {
-                        if (checkBox.isSelected()) {
-                            toRemove.add(checkBoxs.get(checkBox));
-                            checkBox.fire();
-                        }
-                    }
-                    String answesr = api.removeQuestionsBulk(toRemove, token);
-                    if (answesr.contains("Success")) {
-                        sendPopUp("Categorie", "Ajout", "Les questions ont été supprimés", Alert.AlertType.INFORMATION);
-                    } else {
-                        sendPopUp("Catégorie", "Ajout", "Erreur lors de l'ajout : " + answesr, Alert.AlertType.ERROR);
-                    }
-                    categories = new CopyOnWriteArrayList<>(api.getCategories());
-                    questions = new ConcurrentHashMap<>(api.getQuestions());
-                    removeQuestionCache.remove(c);
-                    initializePostAdminLook(token);
-                });
-
-                scrollPaneContent.getChildren().addAll(suppra, valider);
-                scrollPane.setContent(scrollPaneContent);
-                pane.setCenter(scrollPane);
-                removeQuestionCache.put(c, scrollPane);
-
+                ScrollPane s = construct(newValue.getCategory(), token);
+                pane.setCenter(s);
             }
         });
     }
